@@ -5,7 +5,33 @@ import os
 import sys
 import time
 
+from dataclasses import dataclass
+
 from kubernetes import client, config
+
+
+@dataclass
+class Feelings:
+    happiness: int = 0
+
+
+def act_v1():
+    # do nothing
+    pass
+
+
+def feel_v1():
+    feelings = Feelings()
+
+    # More pods, more happiness (up to 100 pods)
+    try:
+        ret = v1.list_pod_for_all_namespaces(watch=False)
+        no_of_pods = len(ret.items)
+        feelings.happiness = max(no_of_pods, 100) // 100
+    except:
+        pass
+
+    return feelings
 
 
 def main():
@@ -19,11 +45,10 @@ def main():
     v1 = client.CoreV1Api()
 
     while True:
-        print("Listing pods with their IPs:")
-        ret = v1.list_pod_for_all_namespaces(watch=False)
-        for i in ret.items:
-            print("%s\t%s\t%s" % (i.status.pod_ip, i.metadata.namespace, i.metadata.name))
         time.sleep(30)
+        feelings = feel_v1(v1)
+        print(f"{feelings=}")
+        act_v1(feelings)
 
 
 if __name__ == "__main__":
