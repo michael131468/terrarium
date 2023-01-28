@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 
+import argparse
+import os
+import sys
 import time
 
 from kubernetes import client, config
 
 
 def main():
-    config.load_incluster_config()
+    # check we're in a cluster
+    if not os.getenv("KUBERNETES_SERVICE_HOST"):
+        print("Error: I only run in-cluster.")
+        sys.exit(1)
 
+    # get the client api for the cluster
+    config.load_incluster_config()
     v1 = client.CoreV1Api()
 
     while True:
